@@ -3,7 +3,7 @@ import torch
 import numpy as np
 
 from dreamer import Dreamer
-from env import RenderObsEnv
+from dreamer.env import RenderObsEnv
 
 env = gym.make('Acrobot-v1', render_mode='rgb_array')
 env = RenderObsEnv(env)
