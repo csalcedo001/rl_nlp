@@ -3,10 +3,10 @@ import torch
 import numpy as np
 
 from dreamer import Dreamer
-from dreamer.env import RenderObsEnv
+from dreamer.env import RenderObsWrapper
 
 env = gym.make('Acrobot-v1', render_mode='rgb_array')
-env = RenderObsEnv(env)
+env = RenderObsWrapper(env)
 
 episodes = 10
 max_iteration = 1000
