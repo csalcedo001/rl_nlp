@@ -2,7 +2,7 @@ import gym
 import numpy as np
 
 
-class RenderObsEnv(gym.Wrapper):
+class RenderObsWrapper(gym.Wrapper):
     def __init__(self, env, *args, **kwargs):
         super().__init__(env, *args, **kwargs)
 

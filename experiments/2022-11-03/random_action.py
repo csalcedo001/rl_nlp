@@ -11,6 +11,7 @@ env = RenderObsWrapper(env)
 episodes = 10
 max_iteration = 1000
 
+print("Started training")
 for episode in range(episodes):
     state = env.reset()
 
@@ -22,9 +23,11 @@ for episode in range(episodes):
 
         next_state, reward, done, _, info = env.step(action)
 
-        print('Episode {}: reward: {}'.format(episode, reward))
+        # print('Episode {}: reward: {}'.format(episode, reward))
 
         if done:
             break
 
         state = next_state
+    
+    print("Finished episode {}".format(episode))
