@@ -3,11 +3,17 @@ import numpy as np
 
 from dreamer.env import RenderObsWrapper
 
-env_name = 'Acrobot-v1'
 
-env = gym.make(env_name, render_mode='rgb_array')
-env = RenderObsWrapper(env)
+### Print environment shapes as provided by the renderer
+env_names = [
+    'Acrobot-v1',
+    'HalfCheetah-v4',
+]
 
-state = env.reset()
+for env_name in env_names:
+    env = gym.make(env_name, render_mode='rgb_array')
+    env = RenderObsWrapper(env)
 
-print("ENV: {:>16}, shape: {}".format(env_name, state.shape))
+    state = env.reset()
+
+    print("ENV: {:>16}, shape: {}".format(env_name, state.shape))
