@@ -5,3 +5,4 @@ torch
 pygame
 torchvision
 imageio
+opencv-python
