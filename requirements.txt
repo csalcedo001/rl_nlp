@@ -1,0 +1,7 @@
+gym
+mujoco
+gym[atari]
+torch
+pygame
+torchvision
+imageio
