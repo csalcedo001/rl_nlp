@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from dreamer.env import RenderObsWrapper
 
-env = gym.make('Acrobot-v1', render_mode='rgb_array')
+env = gym.make('HalfCheetah-v4', render_mode='rgb_array')
 env = RenderObsWrapper(env)
 
 
@@ -36,7 +36,7 @@ print("State shape:", states[0].shape)
 print("Frame size:", frame_size)
 
 out = cv2.VideoWriter(
-    'output_video.mp4',
+    'videos/last.mp4',
     cv2.VideoWriter_fourcc(*'mp4v'),
     20,
     frame_size
