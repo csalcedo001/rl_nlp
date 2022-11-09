@@ -1,18 +1,10 @@
 import gym
-import torch
-from torch import nn
 import numpy as np
-from torchvision.transforms import Compose, CenterCrop, Resize, ToPILImage, ToTensor
+from torchvision.transforms import Compose, Resize, ToPILImage, ToTensor
 from tqdm import tqdm
 
 from dreamer.env import RenderObsWrapper
 from dreamer.utils import save_video
-
-
-def get_render_obs_shape(env):
-    _ = env.reset()
-
-    obs = env.render()
 
 
 ### Print environment shapes as provided by the renderer
@@ -27,8 +19,6 @@ for env_name in env_names:
     env = gym.make(env_name, render_mode='rgb_array')
     env = RenderObsWrapper(env)
 
-    print(env.observation_space.shape)
-
     transform = Compose([
         ToPILImage(),
         Resize(64),
@@ -38,6 +28,7 @@ for env_name in env_names:
     state = env.reset()
 
     print("ENV: {:>16}, shape: {}".format(env_name, state.shape))
+    print("Shape after transform: {}".format(transform(state).numpy().shape))
 
     states = []
 
