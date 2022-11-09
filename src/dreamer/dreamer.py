@@ -10,28 +10,35 @@ class Dreamer(nn.Module):
     def __init__(self, env, hidden):
         super().__init__()
 
+        self.env = env
+
         obs_shape = env.observation_space.shape
         action_shape = env.action_space.shape
 
         channels = obs_shape[2]
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(channels, 32, 4, 2),
+            nn.Conv2d(channels, 32, 4, 2, 1),
             nn.ReLU(),
-            nn.Conv2d(32, 64, 4, 2),
+            nn.Conv2d(32, 64, 4, 2, 1),
             nn.ReLU(),
-            nn.Conv2d(64, 128, 4, 2),
+            nn.Conv2d(64, 128, 4, 2, 1),
             nn.ReLU(),
-            nn.Conv2d(128, 256, 4, 2),
+            nn.Conv2d(128, 256, 4, 2, 1),
             nn.ReLU(),
-            nn.Flatten()
+            nn.Conv2d(256, 100, 4, 1, 1),
+            nn.ReLU(),
         )
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(128, 64, 5, 2),
+            nn.ConvTranspose2d(100, 256, 4, 1, 1),
             nn.ReLU(),
-            nn.ConvTranspose2d(64, 32, 5, 2),
+            nn.ConvTranspose2d(256, 128, 4, 2, 1),
             nn.ReLU(),
-            nn.ConvTranspose2d(32, channels, 6, 2),
+            nn.ConvTranspose2d(128, 64, 4, 2, 1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 32, 4, 2, 1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, channels, 4, 2, 1),
             nn.ReLU(),
         )
 
@@ -60,16 +67,15 @@ class Dreamer(nn.Module):
         #     mean = tf.reshape(mean, tools.shape(features)[:-1] + data_shape)
         #     return tfd.Independent(tfd.Normal(mean, std), len(data_shape))
 
-    def act(self, obs):
-        batch_size = obs.shape[0]
-        print("OBS", obs.shape)
+    def act(self, z):
+        return self.env.action_space.sample()
 
+    def encode(self, obs):
         z = self.encoder(obs)
-        print("Z", z.shape)
-        obs_hat = self.decoder(z.reshape(batch_size, -1, 1, 1))
 
+        return z
+    
+    def decode(self, z):
+        obs_hat = self.decoder(z)
 
-        # if self.train:
-        #     self.encoder()
-
-        return action
+        return obs_hat

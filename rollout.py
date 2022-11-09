@@ -1,64 +1,65 @@
-import torch
-import numpy as np
 import gym
+import torch
+from torchvision import transforms
+import numpy as np
+from tqdm import tqdm
 
 from dreamer import Dreamer
+from dreamer.env import RenderObsWrapper
+from dreamer.utils import save_video
 
 
-# def get_screen(env):
-#     screen = env.render().transpose((2, 0, 1))
-#     print("SCREEN SHAPE", screen.shape)
-#     _, screen_height, screen_width = screen.shape
-#     screen = screen[:, int(screen_height*0.4):int(screen_height * 0.8)]
-#     view_width = int(screen_width * 0.6)
-#     cart_location = get_cart_location(screen_width)
-#     if cart_location < view_width // 2:
-#         slice_range = slice(view_width)
-#     elif cart_location > (screen_width - view_width // 2):
-#         slice_range = slice(-view_width, None)
-#     else:
-#         slice_range = slice(cart_location - view_width // 2,
-#                             cart_location + view_width // 2)
-#     # Strip off the edges, so that we have a square image centered on a cart
-#     screen = screen[:, :, slice_range]
-#     # Convert to float, rescale, convert to torch tensor
-#     # (this doesn't require a copy)
-#     screen = np.ascontiguousarray(screen, dtype=np.float32) / 255
-#     screen = torch.from_numpy(screen)
-#     # Resize, and add a batch dimension (BCHW)
-#     return resize(screen).unsqueeze(0)
+env_name = 'Acrobot-v1'
 
-env = gym.make('Acrobot-v1', render_mode='rgb_array')
-env.reset()
-state = env.render().transpose((2, 0, 1))
-print(state.shape)
+env = gym.make(env_name, render_mode='rgb_array')
+env = RenderObsWrapper(env)
+
+transform = transforms.Compose([
+    transforms.ToPILImage(),
+    transforms.Resize(64),
+    transforms.ToTensor(),
+])
+
+state = env.reset()
+print("ENV: {:>16}, shape: {}".format(env_name, state.shape))
 
 agent = Dreamer(env, 16)
 
 print(agent)
 
-episodes = 100
-max_iteration = 1000
+episodes = 1
+max_iteration = 100
 
-for episode in range(episodes):
-    env.reset()
-    state =env.render().transpose((2, 0, 1))
-    state = get_screen(env)
+obs_list = []
+obs_hat_list = []
 
-    for iteration in range(max_iteration):
-        print("STATE:", state.shape)
-        state = np.transpose(state, (2, 0, 1))
-        print("STATE:", state.shape)
-        state = torch.from_numpy(state).float()
-        state = state.reshape(1, *state.shape)
+with torch.no_grad():
+    for episode in range(episodes):
+        obs = env.reset()
+        total_reward = 0.
 
-        action = agent.act(state)
+        for iteration in tqdm(range(max_iteration)):
+            obs = transform(obs)
+            z = agent.encode(obs)
+            obs_hat = agent.decode(z)
+            
+            action = agent.act(z)
 
-        next_state, reward, done, info = env.step(action)
+            next_obs, reward, done, _, info = env.step(action)
 
-        print('Episode {}: reward: {}'.format(episode, reward))
+            total_reward += reward
+            obs_list.append(obs.numpy())
+            obs_hat_list.append(obs_hat.numpy())
 
-        if done:
-            break
+            if done:
+                break
 
-        state = next_state
+            obs = next_obs
+        
+        print('Episode [{:>3}/{:>3}]: reward: {}'.format(episode + 1, episodes, total_reward))
+
+filename = 'videos/rollout_ae_input_last.mp4'
+save_video(obs_list, filename)
+
+filename = 'videos/rollout_ae_output_last.mp4'
+save_video(obs_hat_list, filename)
