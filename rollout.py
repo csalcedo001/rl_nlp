@@ -9,6 +9,8 @@ from dreamer.env import RenderObsWrapper
 from dreamer.utils import save_video
 
 
+device = 'cuda:0'
+
 env_name = 'Acrobot-v1'
 
 env = gym.make(env_name, render_mode='rgb_array')
@@ -23,7 +25,7 @@ transform = transforms.Compose([
 state = env.reset()
 print("ENV: {:>16}, shape: {}".format(env_name, state.shape))
 
-agent = Dreamer(env, 16)
+agent = Dreamer(env, 16).to(device)
 
 print(agent)
 
@@ -39,7 +41,7 @@ with torch.no_grad():
         total_reward = 0.
 
         for iteration in tqdm(range(max_iteration)):
-            obs = transform(obs)
+            obs = transform(obs).to(device)
             z = agent.encode(obs)
             obs_hat = agent.decode(z)
             
@@ -48,8 +50,8 @@ with torch.no_grad():
             next_obs, reward, done, _, info = env.step(action)
 
             total_reward += reward
-            obs_list.append(obs.numpy())
-            obs_hat_list.append(obs_hat.numpy())
+            obs_list.append(obs.cpu().numpy())
+            obs_hat_list.append(obs_hat.cpu().numpy())
 
             if done:
                 break
