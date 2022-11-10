@@ -47,7 +47,7 @@ with torch.no_grad():
             
             action = agent.act(z)
 
-            next_obs, reward, done, _, info = env.step(action)
+            next_obs, reward, done, info = env.step(action)
 
             total_reward += reward
             obs_list.append(obs.cpu().numpy())

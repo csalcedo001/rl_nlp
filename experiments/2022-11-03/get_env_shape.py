@@ -35,7 +35,7 @@ for env_name in env_names:
     for _ in tqdm(range(max_iteration)):
         action = env.action_space.sample()
 
-        next_state, reward, done, _, _ = env.step(action)
+        next_state, reward, done, _ = env.step(action)
 
         state = transform(state)
         states.append(state.numpy())

@@ -23,7 +23,7 @@ for episode in range(episodes):
 
         action = env.action_space.sample()
 
-        next_state, reward, done, _, info = env.step(action)
+        next_state, reward, done, info = env.step(action)
         total_reward += reward
 
         if done:

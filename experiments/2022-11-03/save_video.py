@@ -19,7 +19,7 @@ states = []
 for iteration in tqdm(range(max_iteration)):
     action = env.action_space.sample()
 
-    next_state, reward, done, _, _ = env.step(action)
+    next_state, reward, done, _ = env.step(action)
 
     states.append(state)
 

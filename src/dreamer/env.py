@@ -24,10 +24,10 @@ class RenderObsWrapper(gym.Wrapper):
         return self.env.action_space
 
     def step(self, action):
-        _, reward, done, _, info = self.env.step(action)
+        _, reward, done, info = self.env.step(action)
         obs = self._get_obs()
 
-        return obs, reward, done, False, info
+        return obs, reward, done, info
 
     def reset(self):
         self.env.reset()
@@ -37,8 +37,7 @@ class RenderObsWrapper(gym.Wrapper):
         return obs
 
     def _get_obs(self):
-        # return self.env.render().transpose((2, 0, 1))
-        return self.env.render()
+        return self.env.render()[0]
 
     def _get_render_obs_shape(self):
         return self.reset().shape
