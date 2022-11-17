@@ -7,7 +7,11 @@ from torch import nn
 from torch import distributions
 
 class Dreamer(nn.Module):
-    def __init__(self, env, hidden):
+    def __init__(self,
+            env,
+            hidden=32,
+            latent_size=100,
+        ):
         super().__init__()
 
         self.env = env
@@ -18,27 +22,27 @@ class Dreamer(nn.Module):
         channels = obs_shape[2]
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(channels, 32, 4, 2, 1),
+            nn.Conv2d(channels, hidden, 4, 2, 1),
             nn.ReLU(),
-            nn.Conv2d(32, 64, 4, 2, 1),
+            nn.Conv2d(hidden, hidden * 2, 4, 2, 1),
             nn.ReLU(),
-            nn.Conv2d(64, 128, 4, 2, 1),
+            nn.Conv2d(hidden * 2, hidden * 4, 4, 2, 1),
             nn.ReLU(),
-            nn.Conv2d(128, 256, 4, 2, 1),
+            nn.Conv2d(hidden * 4, hidden * 8, 4, 2, 1),
             nn.ReLU(),
-            nn.Conv2d(256, 100, 4, 1, 1),
+            nn.Conv2d(hidden * 8, latent_size, 4, 1, 1),
             nn.ReLU(),
         )
         self.decoder = nn.Sequential(
-            nn.ConvTranspose2d(100, 256, 4, 1, 1),
+            nn.ConvTranspose2d(latent_size, hidden * 8, 4, 1, 1),
             nn.ReLU(),
-            nn.ConvTranspose2d(256, 128, 4, 2, 1),
+            nn.ConvTranspose2d(hidden * 8, hidden * 4, 4, 2, 1),
             nn.ReLU(),
-            nn.ConvTranspose2d(128, 64, 4, 2, 1),
+            nn.ConvTranspose2d(hidden * 4, hidden * 2, 4, 2, 1),
             nn.ReLU(),
-            nn.ConvTranspose2d(64, 32, 4, 2, 1),
+            nn.ConvTranspose2d(hidden * 2, hidden, 4, 2, 1),
             nn.ReLU(),
-            nn.ConvTranspose2d(32, channels, 4, 2, 1),
+            nn.ConvTranspose2d(hidden, channels, 4, 2, 1),
             nn.ReLU(),
         )
 
