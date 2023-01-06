@@ -7,7 +7,8 @@ def save_video(
         fps=20,
         channel_first=True,
         low=0.,
-        high=1.
+        high=1.,
+        invert_rgb=False,
     ):
     if channel_first:
         frame_size = frames[0].shape[1:]
@@ -18,7 +19,7 @@ def save_video(
         filename,
         cv2.VideoWriter_fourcc(*'mp4v'),
         fps,
-        frame_size
+        (frame_size[1], frame_size[0])
     )
 
     for frame in frames:
@@ -27,6 +28,9 @@ def save_video(
 
         frame = (frame - low) / (high - low) * 255.
         frame = frame.astype(np.uint8)
+
+        if invert_rgb:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         out.write(frame)
 

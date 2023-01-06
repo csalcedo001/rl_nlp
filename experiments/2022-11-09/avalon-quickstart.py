@@ -1,9 +1,13 @@
+import os
+
 from avalon.agent.godot.godot_gym import GodotEnvironmentParams
 from avalon.agent.godot.godot_gym import TrainingProtocolChoice
 from avalon.agent.godot.godot_gym import AvalonEnv
 from avalon.datagen.env_helper import display_video
-from dreamer.utils import save_video
 from tqdm import tqdm
+
+from dreamer.utils import save_video
+
 
 env_params = GodotEnvironmentParams(
     resolution=256,
@@ -21,11 +25,15 @@ def random_env_step():
     return obs
 
 observations = [random_env_step() for _ in tqdm(range(200))]
+
+print("OBS.RGBD SHAPE:", observations[0]['rgbd'].shape)
+
+filename = os.path.join(os.path.dirname(__file__), "avalon_sample.mp4")
+
 save_video(
     [obs['rgbd'][:, :, :3] for obs in observations],
-    "experiments/2022-11-09/avalon_sample.mp4",
+    filename,
     channel_first=False, 
     low=0,
-    high=255
+    high=255,
 )
-# display_video(observations, fps=10)
