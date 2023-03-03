@@ -68,10 +68,11 @@ algo = (
     ppo.PPOConfig()
     .framework(framework='torch')
     .rollouts(num_rollout_workers=1, horizon=1000)
-    .resources(num_gpus=1)
+    .resources(num_gpus=2)
     .environment(env=MinedojoRGBWrapper, env_config={
         'environment': env,
-        "disable_env_checking": True,
+        'disable_env_checking': True,
+        'horizon': 1000,
     })
     .build()
 )
