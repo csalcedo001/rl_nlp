@@ -5,7 +5,7 @@ import minerl
 from tqdm import tqdm
 
 from dreamer.utils import save_video
-from utils import random_env_step, print_observation_space_dict, print_action_space_dict
+from utils import random_env_step, print_space
 
 
 epochs = 10
@@ -17,8 +17,15 @@ obs = env.reset()
 
 observations = [random_env_step(env, framework='minerl') for _ in tqdm(range(epochs))]
 
-print_observation_space_dict(env, framework='minerl')
-print_action_space_dict(env, framework='minerl')
+print('**************** OBSERVATION SPACE ****************')
+print_space(env.observation_space, framework='minerl')
+print('**************** OBSERVATION SPACE ****************\n')
+
+
+print('**************** ACTION SPACE ****************')
+print_space(env.action_space, framework='minerl')
+print('**************** ACTION SPACE ****************\n')
+
 
 # observations = [random_env_step(i) for i in tqdm(range(200))]
 
