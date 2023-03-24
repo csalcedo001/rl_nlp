@@ -8,14 +8,12 @@ from dreamer.utils import save_video
 from utils import random_env_step, print_space
 
 
-epochs = 10
+epochs = 200
 
 
 env = gym.make('MineRLNavigateDense-v0')
 obs = env.reset()
 
-
-observations = [random_env_step(env, framework='minerl') for _ in tqdm(range(epochs))]
 
 print('**************** OBSERVATION SPACE ****************')
 print_space(env.observation_space, framework='minerl')
@@ -27,31 +25,16 @@ print_space(env.action_space, framework='minerl')
 print('**************** ACTION SPACE ****************\n')
 
 
-# observations = [random_env_step(i) for i in tqdm(range(200))]
-
-# done = False
-
-# for epoch in range(epochs):
-#     while True:
-#         # Take a random action
-#         action = env.action_space.sample()
-#         # In BASALT environments, sending ESC action will end the episode
-#         # Lets not do that
-#         action["ESC"] = 0
-#         obs, reward, done, _ = env.step(action)
-#         env.render()
-
-#         if done:
-#             break
+observations = [random_env_step(i, env, framework='minerl') for i in tqdm(range(epochs))]
 
 
-# filename = os.path.join(os.path.dirname(__file__), "minedojo_sample.mp4")
+filename = os.path.join(os.path.dirname(__file__), "minerl_video.mp4")
 
-# save_video(
-#     [obs['rgb'] for obs in observations],
-#     filename,
-#     channel_first=True, 
-#     low=0,
-#     high=255,
-#     invert_rgb=True,
-# )
+save_video(
+    [obs['pov'] for obs in observations],
+    filename,
+    channel_first=False, 
+    low=0,
+    high=255,
+    invert_rgb=True,
+)

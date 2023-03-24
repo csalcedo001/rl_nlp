@@ -7,7 +7,7 @@ from dreamer.utils import save_video
 from utils import random_env_step, print_space
 
 
-epochs = 10
+epochs = 200
 
 
 env = minedojo.make(
@@ -16,8 +16,6 @@ env = minedojo.make(
 )
 env.reset()
 
-
-observations = [random_env_step(env, framework='minedojo') for _ in tqdm(range(epochs))]
 
 print('**************** OBSERVATION SPACE ****************')
 print_space(env.observation_space, framework='minedojo')
@@ -28,13 +26,15 @@ print_space(env.action_space, framework='minedojo')
 print('**************** ACTION SPACE ****************\n')
 
 
-# filename = os.path.join(os.path.dirname(__file__), "minedojo_sample.mp4")
+observations = [random_env_step(i, env, framework='minedojo') for i in tqdm(range(epochs))]
 
-# save_video(
-#     [obs['rgb'] for obs in observations],
-#     filename,
-#     channel_first=True, 
-#     low=0,
-#     high=255,
-#     invert_rgb=True,
-# )
+filename = os.path.join(os.path.dirname(__file__), "minedojo_video.mp4")
+
+save_video(
+    [obs['rgb'] for obs in observations],
+    filename,
+    channel_first=True, 
+    low=0,
+    high=255,
+    invert_rgb=True,
+)

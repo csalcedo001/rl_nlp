@@ -1,8 +1,15 @@
-def random_env_step(env, framework):
+def random_env_step(i, env, framework):
     action = env.action_space.no_op()
 
-    if framework == "minerl":
-        action["ESC"] = 0 # to avoid ending the episode early
+    if framework == 'minerl':
+        action["ESC"] = 0           # avoid ending the episode early
+        action['forward'] = 1       # move forward
+        if i % 10 == 0:
+            action['jump'] = 1      # jump
+    elif framework == 'minedojo':
+        action[0] = 1               # move forward 
+        if i % 10 == 0:
+            action[2] = 1           # jump
 
     obs, _, done, _ = env.step(action)
     if done:
