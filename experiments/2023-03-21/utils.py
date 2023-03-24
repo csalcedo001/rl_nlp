@@ -11,21 +11,21 @@ def random_env_step(env, framework):
     return obs
 
 def print_observation_space_dict(env, framework):
-    leaves = _get_print_leaves_from_framework(framework)
+    dict_cls = _get_dict_class_from_framework(framework)
     
     print('**************** OBSERVATION SPACE ****************')
-    _print_dict_r(env.observation_space, leaves)
+    _print_dict_r(env.observation_space, dict_cls)
     print('**************** OBSERVATION SPACE ****************\n')
 
 def print_action_space_dict(env, framework):
-    leaves = _get_print_leaves_from_framework(framework)
+    dict_cls = _get_dict_class_from_framework(framework)
     
     print('**************** ACTION SPACE ****************')
-    _print_dict_r(env.action_space, leaves)
+    _print_dict_r(env.action_space, dict_cls)
     print('**************** ACTION SPACE ****************\n')
 
 
-def _print_dict_r(obj, leaves, key=None, tabs=0):
+def _print_dict_r(obj, dict_cls, key=None, tabs=0):
     offset = ' ' * tabs * 4
 
     if key == None:
@@ -33,8 +33,7 @@ def _print_dict_r(obj, leaves, key=None, tabs=0):
     else:
         print(offset, key, ': ', sep='', end='')
 
-    is_leaf_node = sum([isinstance(obj, leaf) for leaf in leaves]) > 0
-    if is_leaf_node:
+    if not isinstance(obj, dict_cls):
         print(obj, ',', sep='')
         return
 
@@ -43,24 +42,18 @@ def _print_dict_r(obj, leaves, key=None, tabs=0):
     for key in obj:
         value = obj[key]
 
-        _print_dict_r(value, leaves, key=key, tabs=tabs + 1)
+        _print_dict_r(value, dict_cls, key=key, tabs=tabs + 1)
 
     print(offset, '},', sep='')
 
-def _get_print_leaves_from_framework(framework):
+def _get_dict_class_from_framework(framework):
     if framework == 'minerl':
         import minerl
-        leaves = [
-            minerl.herobraine.hero.spaces.Box,
-            minerl.herobraine.hero.spaces.Discrete,
-        ]
+        dict_cls = minerl.herobraine.hero.spaces.Dict
     elif framework == 'minedojo':
         import gym
-        leaves = [
-            gym.spaces.box.Box,
-            gym.spaces.box.Discrete,
-        ]
+        dict_cls = gym.spaces.Dict
     else:
         raise ValueError(f"Invalid framework: {framework}")
     
-    return leaves
+    return dict_cls
