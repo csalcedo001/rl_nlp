@@ -1,19 +1,37 @@
 import os
-
-import minedojo
+import time
+import argparse
 from tqdm import tqdm
 
 from dreamer.utils import save_video
 from utils import random_env_step, print_space
 
 
-epochs = 200
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--episodes', type=int, default=200)
+args = parser.parse_args()
 
 
+### Test package import time
+time_data = {}
+
+start_time = time.time()
+import minedojo
+end_time = time.time()
+time_data['import'] = end_time - start_time
+
+
+
+### Test environment creation time
+start_time = time.time()
 env = minedojo.make(
     task_id="harvest_wool_with_shears_and_sheep",
     image_size=(160, 256)
 )
+end_time = time.time()
+time_data['gym_make'] = end_time - start_time
+
 env.reset()
 
 
@@ -26,7 +44,13 @@ print_space(env.action_space, framework='minedojo')
 print('**************** ACTION SPACE ****************\n')
 
 
-observations = [random_env_step(i, env, framework='minedojo') for i in tqdm(range(epochs))]
+### Test execution time
+start_time = time.time()
+observations = [random_env_step(i, env, framework='minedojo') for i in tqdm(range(args.episodes))]
+end_time = time.time()
+time_data['execution'] = end_time - start_time
+
+
 
 filename = os.path.join(os.path.dirname(__file__), "minedojo_video.mp4")
 
@@ -38,3 +62,8 @@ save_video(
     high=255,
     invert_rgb=True,
 )
+
+### Print execution time results
+print('**************** TIME DATA ****************')
+for key, value in time_data.items():
+    print(f"{key}: {value:.5f}s")
