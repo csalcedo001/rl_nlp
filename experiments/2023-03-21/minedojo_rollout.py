@@ -13,9 +13,12 @@ parser.add_argument('--episodes', type=int, default=200)
 args = parser.parse_args()
 
 
-### Test package import time
-time_data = {}
 
+### Test overall execution time
+time_data = {}
+main_start_time = time.time()
+
+### Test package import time
 start_time = time.time()
 import minedojo
 end_time = time.time()
@@ -49,6 +52,10 @@ start_time = time.time()
 observations = [random_env_step(i, env, framework='minedojo') for i in tqdm(range(args.episodes))]
 end_time = time.time()
 time_data['execution'] = end_time - start_time
+
+### Conclude main execution time
+main_end_time = time.time()
+time_data['main'] = main_end_time - main_start_time
 
 
 
