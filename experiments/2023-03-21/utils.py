@@ -17,6 +17,14 @@ def random_env_step(i, env, framework):
     
     return obs
 
+def get_frames_from_observations(observations, framework):
+    if framework == 'minerl':
+        return [obs['pov'] for obs in observations]
+    elif framework == 'minedojo':
+        return [obs['rgb'] for obs in observations]
+    else:
+        raise ValueError(f"Invalid framework: {framework}")
+
 def print_space(space, framework):
     dict_cls = _get_dict_class_from_framework(framework)
     
