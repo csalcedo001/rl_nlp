@@ -2,6 +2,7 @@ import os
 import gym
 import time
 import argparse
+import numpy as np
 from tqdm import tqdm
 
 from dreamer.utils import save_video
@@ -11,15 +12,22 @@ from utils import random_env_step, get_frames_from_observations, print_space
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--framework', required=True, type=str, choices=['minerl', 'minedojo'])
-parser.add_argument('--episodes', type=int, default=200)
+parser.add_argument('--iterations', type=int, default=1000)
+parser.add_argument('--episodes', type=int, default=100)
 
 args = parser.parse_args()
 
 
 
-### Test overall execution time
-time_data = {}
-main_start_time = time.time()
+### Test total execution time
+time_data = {
+    'total': None,
+    'import': None,
+    'gym_make': None,
+    'reset': [],
+    'execution': [],
+}
+total_start_time = time.time()
 
 ### Test package import time
 start_time = time.time()
@@ -44,9 +52,9 @@ elif args.framework == 'minedojo':
 end_time = time.time()
 time_data['gym_make'] = end_time - start_time
 
-env.reset()
 
 
+### Print observation space and action space
 print('**************** OBSERVATION SPACE ****************')
 print_space(env.observation_space, framework=args.framework)
 print('**************** OBSERVATION SPACE ****************\n')
@@ -56,17 +64,30 @@ print_space(env.action_space, framework=args.framework)
 print('**************** ACTION SPACE ****************\n')
 
 
-### Test execution time
-start_time = time.time()
-observations = [random_env_step(i, env, framework=args.framework) for i in tqdm(range(args.episodes))]
-end_time = time.time()
-time_data['execution'] = end_time - start_time
+
+for episode in tqdm(range(args.episodes)):
+    ### Test environment reset time
+    start_time = time.time()
+    env.reset()
+    end_time = time.time()
+    time_data['reset'].append(end_time - start_time)
+
+
+
+    ### Test execution time
+    start_time = time.time()
+    observations = [random_env_step(i, env, framework=args.framework) for i in tqdm(range(args.iterations))]
+    end_time = time.time()
+    time_data['execution'].append(end_time - start_time)
+
+
 
 ### Conclude main execution time
-main_end_time = time.time()
-time_data['main'] = main_end_time - main_start_time
+total_end_time = time.time()
+time_data['total'] = total_end_time - total_start_time
 
 
+### Save video
 video_name = f'{args.framework}_video.mp4'
 filename = os.path.join(os.path.dirname(__file__), video_name)
 
@@ -83,4 +104,7 @@ save_video(
 ### Print execution time results
 print('**************** TIME DATA ****************')
 for key, value in time_data.items():
-    print(f"{key}: {value:.5f}s")
+    if isinstance(value, str):
+        print(f"{key}: {value:.5f}s")
+    else:
+        print(f"{key}: {value}")
