@@ -1,3 +1,6 @@
+import cv2
+import numpy as np
+
 def random_env_step(i, env, framework):
     action = env.action_space.no_op()
 
@@ -63,3 +66,38 @@ def _get_dict_class_from_framework(framework):
         raise ValueError(f"Invalid framework: {framework}")
     
     return dict_cls
+
+def save_video(
+        frames,
+        filename,
+        fps=20,
+        channel_first=True,
+        low=0.,
+        high=1.,
+        invert_rgb=False,
+    ):
+    if channel_first:
+        frame_size = frames[0].shape[1:]
+    else:
+        frame_size = frames[0].shape[:2]
+
+    out = cv2.VideoWriter(
+        filename,
+        cv2.VideoWriter_fourcc(*'mp4v'),
+        fps,
+        (frame_size[1], frame_size[0])
+    )
+
+    for frame in frames:
+        if channel_first:
+            frame = np.transpose(frame, (1, 2, 0))
+
+        frame = (frame - low) / (high - low) * 255.
+        frame = frame.astype(np.uint8)
+
+        if invert_rgb:
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        out.write(frame)
+
+    out.release()

@@ -2,11 +2,9 @@ import os
 import gym
 import time
 import argparse
-import numpy as np
 from tqdm import tqdm
 
-from dreamer.utils import save_video
-from utils import random_env_step, get_frames_from_observations, print_space
+from utils import random_env_step, get_frames_from_observations, print_space, save_video
 
 
 
@@ -24,6 +22,7 @@ time_data = {
     'total': None,
     'import': None,
     'gym_make': None,
+    'first_reset': None,
     'reset': [],
     'execution': [],
 }
@@ -43,11 +42,11 @@ time_data['import'] = end_time - start_time
 ### Test environment creation time
 start_time = time.time()
 if args.framework == 'minerl':
-    env = gym.make('MineRLNavigateDense-v0')
+    env = gym.make('MineRLObtainDiamond-v0') # MineRL uses 64x64 by default
 elif args.framework == 'minedojo':
     env = minedojo.make(
-        task_id="harvest_wool_with_shears_and_sheep",
-        image_size=(160, 256)
+        task_id="harvest_1_diamond",
+        image_size=(64, 64)
 )
 end_time = time.time()
 time_data['gym_make'] = end_time - start_time
@@ -62,6 +61,14 @@ print('**************** OBSERVATION SPACE ****************\n')
 print('**************** ACTION SPACE ****************')
 print_space(env.action_space, framework=args.framework)
 print('**************** ACTION SPACE ****************\n')
+
+
+
+### Test environment reset time
+start_time = time.time()
+env.reset()
+end_time = time.time()
+time_data['first_reset'] = end_time - start_time
 
 
 
