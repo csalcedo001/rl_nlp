@@ -3,8 +3,14 @@ import gym
 import time
 import argparse
 from tqdm import tqdm
+import wandb
 
 from utils import random_env_step, get_frames_from_observations, print_space, save_video
+
+
+
+WANDB_ENTITY = 'cesar-salcedo'
+WANDB_PROJECT = 'minedojo_vs_minerl'
 
 
 
@@ -17,14 +23,21 @@ args = parser.parse_args()
 
 
 
-### Test total execution time
+# Init W&B
+wandb.init(
+    project=WANDB_PROJECT,
+    entity=WANDB_ENTITY,
+    config=args,
+)
+
+### Test total step time
 time_data = {
     'total': None,
     'import': None,
     'gym_make': None,
     'first_reset': None,
     'reset': [],
-    'execution': [],
+    'step': [],
 }
 total_start_time = time.time()
 
@@ -36,6 +49,12 @@ elif args.framework == 'minedojo':
     import minedojo
 end_time = time.time()
 time_data['import'] = end_time - start_time
+
+wandb.log({
+    'time': {
+        'import': time_data['import'],
+    }
+})
 
 
 
@@ -50,6 +69,12 @@ elif args.framework == 'minedojo':
 )
 end_time = time.time()
 time_data['gym_make'] = end_time - start_time
+
+wandb.log({
+    'time': {
+        'gym_make': time_data['gym_make'],
+    }
+})
 
 
 
@@ -70,6 +95,12 @@ env.reset()
 end_time = time.time()
 time_data['first_reset'] = end_time - start_time
 
+wandb.log({
+    'time': {
+        'first_reset': time_data['first_reset'],
+    }
+})
+
 
 
 for episode in tqdm(range(args.episodes)):
@@ -81,15 +112,22 @@ for episode in tqdm(range(args.episodes)):
 
 
 
-    ### Test execution time
+    ### Test step time
     start_time = time.time()
     observations = [random_env_step(i, env, framework=args.framework) for i in tqdm(range(args.iterations))]
     end_time = time.time()
-    time_data['execution'].append(end_time - start_time)
+    time_data['step'].append((end_time - start_time) / args.iterations)
+
+    wandb.log({
+        'time': {
+            'reset': time_data['reset'][-1],
+            'step': time_data['step'][-1],
+        }
+    })
 
 
 
-### Conclude main execution time
+### Conclude main step time
 total_end_time = time.time()
 time_data['total'] = total_end_time - total_start_time
 
@@ -108,10 +146,16 @@ save_video(
     invert_rgb=True,
 )
 
-### Print execution time results
+### Print step time results
 print('**************** TIME DATA ****************')
 for key, value in time_data.items():
     if isinstance(value, str):
         print(f"{key}: {value:.5f}s")
     else:
         print(f"{key}: {value}")
+
+wandb.log({
+    'time': {
+        'total': time_data['total'],
+    }
+})
