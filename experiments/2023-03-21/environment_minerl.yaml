@@ -1,0 +1,12 @@
+name: minerl
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - openjdk=8
+  - pip=23.0.1
+  - python=3.9
+  - pip:
+    - minerl==0.4.4
+    - numpy==1.24.2
+    - opencv-python~=4.7.0
