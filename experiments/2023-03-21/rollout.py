@@ -9,8 +9,8 @@ from utils import random_env_step, get_frames_from_observations, print_space, sa
 
 
 
-WANDB_ENTITY = 'cesar-salcedo'
-WANDB_PROJECT = 'minedojo_vs_minerl'
+WANDB_ENTITY = 'your-wandb-entity'
+WANDB_PROJECT = 'your-wandb-project'
 
 
 
@@ -36,6 +36,8 @@ time_data = {
     'import': None,
     'gym_make': None,
     'first_reset': None,
+    'average_reset': None,
+    'average_step': None,
     'reset': [],
     'step': [],
 }
@@ -124,6 +126,9 @@ for episode in tqdm(range(args.episodes)):
             'step': time_data['step'][-1],
         }
     })
+
+time_data['average_reset'] = sum(time_data['reset']) / len(time_data['reset'])
+time_data['average_step'] = sum(time_data['step']) / len(time_data['step'])
 
 
 
