@@ -1,6 +1,7 @@
 # Local
 repos
 videos
+wandb
 *.mp4
 
 
