@@ -130,6 +130,13 @@ for episode in tqdm(range(args.episodes)):
 time_data['average_reset'] = sum(time_data['reset']) / len(time_data['reset'])
 time_data['average_step'] = sum(time_data['step']) / len(time_data['step'])
 
+wandb.log({
+    'time': {
+        'average_reset': time_data['average_reset'],
+        'average_step': time_data['average_step'],
+    }
+})
+
 
 
 ### Conclude main step time
