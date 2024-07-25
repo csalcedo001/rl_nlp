@@ -4,13 +4,21 @@ import time
 import argparse
 from tqdm import tqdm
 import wandb
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from utils import random_env_step, get_frames_from_observations, print_space, save_video
 
 
 
-WANDB_ENTITY = 'your-wandb-entity'
-WANDB_PROJECT = 'your-wandb-project'
+if 'WANDB_ENTITY' not in os.environ:
+    raise ValueError('WANDB_ENTITY not found in environment variables')
+WANDB_ENTITY = os.environ.get('WANDB_ENTITY')
+
+if 'WANDB_PROJECT' not in os.environ:
+    raise ValueError('WANDB_PROJECT not found in environment variables')
+WANDB_PROJECT = os.environ.get('WANDB_PROJECT')
 
 
 
